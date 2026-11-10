@@ -1,0 +1,107 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing version tag, for example v1.4.1'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+
+jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ inputs.tag || github.ref }}
+  packages:
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+      - run: python3 script/check.py --tag "$RELEASE_TAG"
+      - run: python3 script/package.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-browser-packages
+          path: |
+            outputs/*.zip
+            outputs/*.xpi
+          if-no-files-found: error
+  safari:
+    needs: verify
+    runs-on: xcode-27
+    timeout-minutes: 20
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_27.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+      - run: python3 script/check.py --tag "$RELEASE_TAG"
+      - run: ./script/build_and_run.sh --build-only
+      - name: Archive local-development Safari app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            'work/safari-derived/Build/Products/Release/Conversation Minimap.app' \
+            outputs/conversation-minimap-safari-app.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-safari-app
+          path: outputs/conversation-minimap-safari-app.zip
+          if-no-files-found: error
+  publish:
+    needs: [packages, safari]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: outputs/
+      - run: python3 script/checksums.py outputs
+      - name: Publish versioned GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view "$RELEASE_TAG" --json isDraft > work-release.json 2>/dev/null; then
+            if [ "$(jq -r .isDraft work-release.json)" != true ]; then
+              echo "Version already published; existing release is preserved."
+              exit 0
+            fi
+          else
+            gh release create "$RELEASE_TAG" --draft --verify-tag \
+              --title "AI MiniMap $RELEASE_TAG" --generate-notes --notes-file docs/RELEASE-NOTES.md
+          fi
+          gh release upload "$RELEASE_TAG" outputs/*.zip outputs/*.xpi outputs/SHA256SUMS --clobber
+          gh release edit "$RELEASE_TAG" --draft=false

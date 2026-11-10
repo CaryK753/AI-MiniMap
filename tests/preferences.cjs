@@ -23,6 +23,11 @@ const assert=require('node:assert/strict');const fs=require('node:fs/promises');
    assert.equal(await page.locator('.heading').first().innerText(),chinese?'对话导航':'Conversation');
    assert.equal(await page.locator('.settings-trigger').innerText(),chinese?'设置':'Settings');
    assert.equal(await page.locator('.settings-trigger svg').count(),1);
+   assert.equal(await page.locator('.panel').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 255, 255)');
+   await page.locator('.settings-trigger').click();
+   assert.equal(await page.locator('[name="glass"]').isChecked(),false);
+   await page.locator('[name="glass"]').check();
+   await page.locator('.settings-back').click();
    if(engine==='webkit'){
     assert.equal(await page.locator('.panel').evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(255, 255, 255, 0.48)');
     if(chinese) await page.locator('.panel').screenshot({path:'work/test-artifacts/webkit-settings-entry.png'});
@@ -45,9 +50,11 @@ const assert=require('node:assert/strict');const fs=require('node:fs/promises');
    await page.locator('[name="format"][value="txt"]').check();
    const event=page.waitForEvent('download');await page.locator('.download').click();const file=await event;
    const text=await fs.readFile(await file.path(),'utf8');assert(text.includes('【User · 1】'));assert(text.includes('正文保留中文'));assert(text.includes('Exported at'));
-   await load();assert.equal(await page.locator('.shell').getAttribute('lang'),'en');
+   await load();assert.equal(await page.locator('#conversation-minimap-extension').getAttribute('data-glass'),'true');assert.equal(await page.locator('.shell').getAttribute('lang'),'en');
    assert.equal(await page.locator('#conversation-minimap-extension').getAttribute('data-theme'),'dark');
    await page.locator('.rail').hover();await page.locator('.settings-trigger').click();
+   await page.locator('[name="glass"]').uncheck();
+   assert.equal(await page.locator('.panel').evaluate(el=>getComputedStyle(el).backdropFilter || getComputedStyle(el).webkitBackdropFilter),'none');
    await page.locator('[name="theme"]').selectOption('system');await page.locator('[name="language"]').selectOption('auto');
    assert.equal(await page.locator('.settings-view .heading').innerText(),chinese?'偏好设置':'Preferences');
    if(locale==='en-US'){

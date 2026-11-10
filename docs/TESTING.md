@@ -65,3 +65,7 @@ The five images under `docs/images/` are generated from `tests/fixtures.cjs`. Th
 1.4.0 在 Chromium、Firefox、WebKit 三种引擎下验证了网站角色提取、导航、定时任务纯回复导航、空白页隐藏、左右位置、侧边栏避让、历史采集、节点复用、三种格式下载、中英切换、主题和动效。
 
 真实账号只做只读页面结构核对；与浏览器引擎里的合成对话测试明确区分。独立旧版 Codex 任务页面没有真实账号验证，Firefox 没有 AMO 签名，Safari 没有发行签名 / 公证。公开截图全部来自合成内容，不包含私人会话。
+
+## 1.4.1 regression
+
+Author: wwj. Local Chromium, Firefox and WebKit suites passed, including glass disabled by default, toggle persistence, adaptive rail bounds, compact history placement, same-URL export cancellation and sidebar observer cleanup. Clean/repeatable packaging and tag/version checks passed. Safari ad-hoc build and signature verification passed. GitHub Actions independently runs the committed suites with locked Playwright dependencies.

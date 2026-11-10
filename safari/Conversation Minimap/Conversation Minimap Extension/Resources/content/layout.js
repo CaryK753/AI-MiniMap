@@ -3,7 +3,7 @@
     const candidates = 'aside,nav[aria-label],[role="navigation"],mat-sidenav,side-navigation,side-navigation-v2,[data-testid="sidebar"],[data-test-id="side-nav"],[aria-label="Side navigation"],[aria-label="Sidebar"],[aria-label="侧边导航栏"]';
     let frame = 0;
     const sizes = new ResizeObserver(schedule);
-    const observed = new WeakSet();
+    const observed = new Set();
     function sidebarEdge() {
       let edge = 0;
       document.querySelectorAll(candidates).forEach(element => {
@@ -21,6 +21,9 @@
     function update() {
       frame = 0;
       const left = shell.dataset.side === 'left';
+      for (const element of observed) {
+        if (!left || !element.isConnected) { sizes.unobserve(element); observed.delete(element); }
+      }
       const edge = left ? sidebarEdge() : 0;
       const obstructed = left && edge > 0 && innerWidth - edge < 260;
       shell.dataset.obstructed = String(obstructed);

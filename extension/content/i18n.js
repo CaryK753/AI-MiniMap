@@ -5,6 +5,7 @@
       navigation: 'Conversation', subtitle: 'Jump back to any prompt', navigationLabel: 'Conversation minimap',
       promptsLabel: 'User prompts', promptCount: '{count} prompts', local: 'Local', localProcessing: 'Processed on device',
       export: 'Export conversation', expand: 'Open conversation navigation', back: 'Back to navigation',
+      glassEffect: 'Glass effect', historyChecked: 'Page history checked', recheckHistory: 'Check again',
       ready: 'Read earlier messages', loadEarlier: 'Load earlier', stop: 'Stop',
       emptyPrompts: 'No user prompts yet. You can export AI replies or load earlier messages.',
       include: 'Include', userPrompts: 'User prompts', aiReplies: 'AI replies', format: 'File format',
@@ -26,13 +27,14 @@
       system: 'System', light: 'Light', dark: 'Dark', preferences: 'Preferences',
       preferenceNote: 'Only language and appearance are saved. Your conversations stay in this tab.',
       saveFailed: 'Could not save preferences. Changes apply only in this tab.', saved: 'Preferences saved',
-      glassNote: 'Glass effects adapt to this browser and your system accessibility settings.'
+      glassNote: 'Off by default. Enable translucent glass; system accessibility settings take priority.'
     },
     'zh-CN': {
       replyCount: '{count} 条回复', repliesSubtitle: '快速跳转每次任务更新或 AI 回复', position: '位置', left: '左侧', right: '右侧',
       navigation: '对话导航', subtitle: '快速回到任意一条提示词', navigationLabel: '对话缩略导航',
       promptsLabel: '用户提示词列表', promptCount: '{count} 条提示词', local: '本地', localProcessing: '当前对话 · 本地处理',
       export: '导出对话', expand: '展开对话导航', back: '返回对话导航',
+      glassEffect: '玻璃效果', historyChecked: '已遍历页面历史', recheckHistory: '重新检查',
       ready: '可加载更早记录', loadEarlier: '加载更早记录', stop: '停止',
       emptyPrompts: '暂无用户提示词。可导出 AI 回复，或加载更早记录。',
       include: '包含内容', userPrompts: '用户提示词', aiReplies: 'AI 回复', format: '文件格式',
@@ -54,7 +56,7 @@
       system: '跟随系统', light: '亮色', dark: '暗色', preferences: '偏好设置',
       preferenceNote: '仅保存语言和外观偏好，对话内容只保留在当前页面。',
       saveFailed: '偏好未能保存，本次更改仅在当前页面生效。', saved: '偏好已保存',
-      glassNote: '玻璃效果会适配当前浏览器与系统辅助功能设置。'
+      glassNote: '默认关闭。开启后显示半透明玻璃；优先遵循系统辅助功能设置。'
     }
   };
   let preference = 'auto';

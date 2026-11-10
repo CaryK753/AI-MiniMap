@@ -2,11 +2,12 @@
   const i18n = globalThis.ConversationMinimapI18n;
   const api = globalThis.browser || globalThis.chrome;
   const key = 'conversationMinimapPreferences';
-  let values = { theme: 'system', language: 'auto', side: 'right' };
+  let values = { theme: 'system', language: 'auto', side: 'right', glass: false };
   const subscribers = new Set();
   function normalize(input = {}) {
     if (!input || typeof input !== 'object') input = {};
     return {
+      glass: input.glass === true,
       side: ['left', 'right'].includes(input.side) ? input.side : 'right',
       theme: ['system', 'light', 'dark'].includes(input.theme) ? input.theme : 'system',
       language: ['auto', 'en', 'zh-CN'].includes(input.language) ? input.language : 'auto'
@@ -41,7 +42,7 @@
         <option value="system" data-i18n="system"></option><option value="light" data-i18n="light"></option><option value="dark" data-i18n="dark"></option>
       </select></label><label><span data-i18n="language"></span><select name="language">
         <option value="auto" data-i18n="automatic"></option><option value="zh-CN">简体中文</option><option value="en">English</option>
-      </select></label><p data-i18n="glassNote"></p><p data-i18n="preferenceNote"></p><p class="settings-status" role="status" aria-live="polite"></p></div>`;
+      </select></label><label><span data-i18n="glassEffect"></span><input type="checkbox" role="switch" name="glass"></label><p data-i18n="glassNote"></p><p data-i18n="preferenceNote"></p><p class="settings-status" role="status" aria-live="polite"></p></div>`;
     root.querySelector('.panel').append(view);
     const status = view.querySelector('.settings-status');
     function close() { view.hidden = true; navigation.hidden = false; }
@@ -55,7 +56,13 @@
       const saved = await set({ [select.name]: select.value });
       status.textContent = i18n.t(saved ? 'saved' : 'saveFailed');
     }));
+    view.querySelector('[name="glass"]').addEventListener('change', async event => {
+      const saved = await set({ glass: event.target.checked });
+      status.textContent = i18n.t(saved ? 'saved' : 'saveFailed');
+    });
     function update(preferences) {
+      host.dataset.glass = String(preferences.glass);
+      view.querySelector('[name="glass"]').checked = preferences.glass;
       host.dataset.theme = preferences.theme;
       shell.dataset.side = preferences.side;
       view.querySelector('[name="side"]').value = preferences.side;

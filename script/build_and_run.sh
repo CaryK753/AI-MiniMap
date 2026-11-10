@@ -14,7 +14,7 @@ app_bundle="$derived_dir/Build/Products/Release/$app_name.app"
 if [[ "$mode" != --build-only ]]; then
   if pgrep -x "$app_name" >/dev/null; then pkill -x "$app_name"; fi
 fi
-/usr/bin/ditto "$root_dir/extension" "$project_dir/$app_name Extension/Resources"
+python3 "$root_dir/script/package.py"
 xcodebuild -project "$project_dir/$app_name.xcodeproj" -scheme "$app_name" -configuration Release \
   -derivedDataPath "$derived_dir" CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual build
 /usr/bin/codesign --verify --deep --strict "$app_bundle"

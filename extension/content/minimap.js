@@ -12,8 +12,8 @@
   root.innerHTML = `<style>${globalThis.ConversationMinimapStyles}</style>
     <nav class="shell" hidden data-i18n-aria="navigationLabel">
       <section class="panel" data-i18n-aria="navigationLabel">
-        <section class="navigation-view"><header><div><span class="heading" data-i18n="navigation"></span><small data-i18n="subtitle"></small></div><span class="count badge"></span></header>
-        <div class="history-bar"><span class="history-status" role="status"></span><button class="secondary history-trigger" data-i18n="loadEarlier"></button></div><div class="list"></div><footer><button class="secondary settings-trigger"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 3-.7 2.3-2 .9-2.2-.5-2 3.5 1.5 1.8v2l-1.5 1.8 2 3.5 2.2-.5 2 .9.7 2.3h4.9l.7-2.3 2-.9 2.2.5 2-3.5-1.5-1.8v-2l1.5-1.8-2-3.5-2.2.5-2-.9-.7-2.3Z"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="appearance"></span></button><button class="secondary export-trigger"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg><span data-i18n="export"></span></button></footer></section>
+        <section class="navigation-view"><header><div><span class="heading" data-i18n="navigation"></span><small data-i18n="subtitle"></small></div><span class="count badge"></span>
+        <div class="history-bar"><span class="history-status" role="status"></span><button class="secondary history-trigger" data-i18n="loadEarlier"></button></div></header><div class="list"></div><footer><button class="secondary settings-trigger"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 3-.7 2.3-2 .9-2.2-.5-2 3.5 1.5 1.8v2l-1.5 1.8 2 3.5 2.2-.5 2 .9.7 2.3h4.9l.7-2.3 2-.9 2.2.5 2-3.5-1.5-1.8v-2l1.5-1.8-2-3.5-2.2.5-2-.9-.7-2.3Z"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="appearance"></span></button><button class="secondary export-trigger"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg><span data-i18n="export"></span></button></footer></section>
       </section>
       <button class="rail" data-i18n-aria="expand" aria-expanded="false"><span class="track"><span class="viewport"></span></span></button>
     </nav>`;
@@ -91,6 +91,7 @@
     const next = (prompts.length ? prompts : all).map(entry => ({ ...entry, text: entry.text.replace(/\s+/g, ' ') }));
     root.querySelector('.count').textContent = t(repliesOnly ? 'replyCount' : 'promptCount', { count: next.length });
     root.querySelector('.navigation-view small').textContent = t(repliesOnly ? 'repliesSubtitle' : 'subtitle');
+    shell.style.setProperty('--rail-height', `${Math.min(220, Math.max(52, 36 + next.length * 12))}px`);
     shell.hidden = !adapter.supported() || !all.length;
     shell.dataset.empty = String(!next.length);
     if (initialized && next.length === entries.length && next.every((entry, i) =>
@@ -164,8 +165,10 @@
   root.querySelector('.history-trigger').addEventListener('click', () => history.state.busy ? history.stop() : history.scan());
   history.subscribe(state => {
     shell.dataset.busy = String(state.busy);
-    root.querySelector('.history-status').textContent = state.text;
-    root.querySelector('.history-trigger').textContent = t(state.busy ? 'stop' : 'loadEarlier');
+    const status = root.querySelector('.history-status');
+    status.textContent = state.reason === 'not-scanned' && !state.busy ? '' : state.reason === 'edges' && !state.busy ? t('historyChecked') : state.text;
+    status.title = state.text;
+    root.querySelector('.history-trigger').textContent = t(state.busy ? 'stop' : state.reason === 'edges' ? 'recheckHistory' : 'loadEarlier');
   });
   document.addEventListener('conversation-minimap-history', refresh);
   document.addEventListener('conversation-minimap-route', () => { history.reset(); exportPanel.close(); settingsPanel.close(); });

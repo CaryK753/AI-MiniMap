@@ -4,8 +4,8 @@
     const panel = root.querySelector('.panel');
     const view = document.createElement('section');
     view.className = 'export-view'; view.hidden = true;
-    view.innerHTML = `<header><button class="icon-button back" data-i18n-aria="back">←</button><div class="heading" data-i18n="export"></div><span class="badge" data-i18n="local"></span></header>
-      <div class="history-bar"><span class="export-history-status" role="status"></span><button class="secondary export-history-trigger" data-i18n="loadEarlier"></button></div><div class="export-options">
+    view.innerHTML = `<header><button class="icon-button back" data-i18n-aria="back">←</button><div class="heading" data-i18n="export"></div><span class="badge" data-i18n="local"></span>
+      <div class="history-bar"><span class="export-history-status" role="status"></span><button class="secondary export-history-trigger" data-i18n="loadEarlier"></button></div></header><div class="export-options">
         <fieldset><legend data-i18n="include"></legend><div class="role-options">
           <label><input type="checkbox" name="role" value="user" checked><span data-i18n="userPrompts"></span></label>
           <label><input type="checkbox" name="role" value="assistant" checked><span data-i18n="aiReplies"></span></label>
@@ -30,7 +30,8 @@
     const status = view.querySelector('.export-status');
     const serializer = globalThis.ConversationMinimapSerialize;
     const history = globalThis.ConversationMinimapHistory;
-    let snapshot = [], selected = new Set(), sourceUrl = '', title = '', processing = false;
+    const store = globalThis.ConversationMinimapStore;
+    let snapshot = [], selected = new Set(), sourceUrl = '', title = '', processing = false, snapshotEpoch = 0;
     const format = () => view.querySelector('[name="format"]:checked').value;
     const roles = () => new Set([...view.querySelectorAll('[name="role"]:checked')].map(input => input.value));
     const available = () => snapshot.filter(entry => roles().has(entry.role));
@@ -73,7 +74,7 @@
       view.hidden = true; navigation.forEach(child => child.hidden = false);
     }
     function open() {
-      snapshot = serializer.snapshot(); sourceUrl = location.href; title = document.title || t('conversationTitle');
+      snapshot = serializer.snapshot(); snapshotEpoch = store.epoch; sourceUrl = location.href; title = document.title || t('conversationTitle');
       selected = new Set(snapshot.map(entry => entry.key));
       view.querySelectorAll('[name="role"]').forEach(input => input.checked = true);
       status.textContent = ''; render();
@@ -93,16 +94,17 @@
     });
     download.addEventListener('click', async () => {
       if (processing || history.state.busy) return;
-      if (location.href !== sourceUrl) {
+      if (location.href !== sourceUrl || store.epoch !== snapshotEpoch) {
         status.textContent = t('routeChanged'); return;
       }
       const entries = available().filter(entry => selected.has(entry.key));
       if (!entries.length) return;
       const preparingSince = performance.now();
-      const originUrl = sourceUrl, originTitle = title, extension = format();
+      const originUrl = sourceUrl, originTitle = title, extension = format(), originEpoch = snapshotEpoch;
+      const stillCurrent = () => location.href === originUrl && sourceUrl === originUrl && store.epoch === originEpoch;
       processing = true; update();
       await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-      if (location.href !== originUrl || sourceUrl !== originUrl) { processing = false; update(); return; }
+      if (!stillCurrent()) { processing = false; update(); return; }
       const metadata = { title: originTitle, url: originUrl, exportedAt: new Date().toISOString(),
         scope: 'collected-messages', collection: { reason: history.state.reason, note: t('collectionNote') }, platform: globalThis.ConversationMinimapAdapter.platform() };
       const mime = { txt: 'text/plain', md: 'text/markdown', json: 'application/json' };
@@ -110,7 +112,7 @@
       try {
         const text = serializer.file(entries, extension, metadata);
         await new Promise(resolve => setTimeout(resolve, Math.max(0, 180 - (performance.now() - preparingSince))));
-        if (location.href !== originUrl || sourceUrl !== originUrl) return;
+        if (!stillCurrent()) return;
         url = URL.createObjectURL(new Blob([text], { type: `${mime[extension]};charset=utf-8` }));
         const anchor = document.createElement('a'); anchor.href = url;
         const basename = originTitle.replace(/[<>:"/\\|?*\u0000-\u001f]/g, '_').replace(/[. ]+$/g, '').slice(0, 70) || t('conversationTitle');

@@ -4,7 +4,7 @@
 
 A lightweight, local-first conversation navigator for **ChatGPT, Gemini and Claude**. Hover to open the capsule, jump between prompts, collect earlier messages, and export the parts you need.
 
-**Version 1.4.0** · Author: **wwj** · [MIT License](LICENSE)
+**Version 1.4.1** · Author: **wwj** · [MIT License](LICENSE)
 
 ## What it does
 
@@ -88,7 +88,7 @@ Only messages supplied by the webpage can be collected. A website may load histo
 
 Conversation caches are in this tab's memory only and clear on refresh / conversation change. Images are exported as references or placeholders; attachment files are not bundled. Markdown is reconstructed from visible webpage structure rather than retrieved as original server Markdown. Hidden branches and separate tool / terminal panels are not exported.
 
-Chromium and Firefox use CSS translucent glass. Safari webpage panels use **WebKit CSS glass**, not native Liquid Glass. The macOS containing app uses **native SwiftUI Liquid Glass on macOS 26+**, with a system-material fallback on older macOS versions.
+Glass is disabled by default; enable it in Settings. Chromium and Firefox use CSS translucent glass. Safari webpage panels use **WebKit CSS glass**, not native Liquid Glass. The macOS containing app uses **native SwiftUI Liquid Glass on macOS 26+**, with a system-material fallback on older macOS versions.
 
 ## Privacy
 
@@ -126,3 +126,13 @@ docs/            Screenshots, Safari instructions and test notes
 `extension/content/profiles.js` centralizes site-specific hooks. `layout.js` owns sidebar-aware placement; `adapter.js` and `store.js` handle message identity and conversation boundaries.
 
 For macOS native development, run `./script/build_and_run.sh --build-only` or use the Xcode scheme. The default script also launches the app. Local application builds use ad-hoc signing; they are **not notarized distribution builds**.
+
+## Automated releases
+
+See [release instructions](docs/RELEASING.md). Version tags automatically test, package and publish GitHub Releases with checksums.
+
+Current compact navigation and Settings (glass disabled):
+
+![Compact navigation](docs/images/compact-navigation.png)
+
+![Glass toggle](docs/images/settings-glass-toggle.png)

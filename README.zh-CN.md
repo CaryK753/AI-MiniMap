@@ -4,7 +4,7 @@
 
 为 **ChatGPT、Gemini 和 Claude** 提供轻量的对话缩略导航。悬浮展开胶囊面板，点击提示词跳转，读取更早记录，并选择需要的内容导出。
 
-**版本 1.4.0** · 作者：**wwj** · [MIT 许可证](LICENSE)
+**版本 1.4.1** · 作者：**wwj** · [MIT 许可证](LICENSE)
 
 ## 功能
 
@@ -88,7 +88,7 @@ Firefox 临时附加组件在重启浏览器后移除；正式持久安装需要
 
 消息缓存只保留在当前页面内存；刷新或切换会话后清空。图片仅导出引用或占位文字，不打包附件文件。Markdown 由网页结构转换，不是服务端原始 Markdown。隐藏分支及独立工具 / 终端面板不在导出范围。
 
-Chromium 和 Firefox 使用 CSS 半透明玻璃；Safari 网页面板使用 **WebKit CSS 玻璃效果**。**原生 Liquid Glass 只用于 macOS 26+ 的承载应用窗口**，较旧系统使用系统半透明材质，网页面板不会变成原生 SwiftUI 材质。
+玻璃效果默认关闭，可在设置中开启。Chromium 和 Firefox 使用 CSS 半透明玻璃；Safari 网页面板使用 **WebKit CSS 玻璃效果**。**原生 Liquid Glass 只用于 macOS 26+ 的承载应用窗口**，较旧系统使用系统半透明材质，网页面板不会变成原生 SwiftUI 材质。
 
 ## 隐私
 
@@ -126,3 +126,13 @@ docs/            截图、Safari 安装说明及验证记录
 网站结构集中在 `extension/content/profiles.js`；侧边栏避让由 `layout.js` 负责，消息标识及会话隔离由 `adapter.js`、`store.js` 负责。
 
 macOS 构建可运行 `./script/build_and_run.sh --build-only`，或打开 Xcode 工程。脚本默认模式会构建并启动应用。本地原生构建采用 ad-hoc 签名，**没有 Apple 发行签名或公证**。
+
+## 自动发布
+
+参见[发布指南](docs/RELEASING.md)。推送版本标签后自动测试、打包并发布 GitHub Release，附带文件校验值。
+
+紧凑导航与设置（玻璃效果关闭）：
+
+![Compact navigation](docs/images/compact-navigation.png)
+
+![Glass toggle](docs/images/settings-glass-toggle.png)
