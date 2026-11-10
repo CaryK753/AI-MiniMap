@@ -1,0 +1,8 @@
+{
+  "extensionName": {
+    "message": "Conversation Minimap · 对话导航"
+  },
+  "extensionDescription": {
+    "message": "ChatGPT / Gemini / Claude 对话缩略导航，悬浮展开、点击跳转，选择消息导出 TXT、Markdown 或 JSON。"
+  }
+}

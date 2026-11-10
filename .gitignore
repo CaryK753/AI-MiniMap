@@ -1,0 +1,13 @@
+work/
+outputs/
+.codex/
+node_modules/
+.DS_Store
+*.log
+*.app/
+*.zip
+*.xpi
+**/xcuserdata/
+**/.build/
+__pycache__/
+*.pyc

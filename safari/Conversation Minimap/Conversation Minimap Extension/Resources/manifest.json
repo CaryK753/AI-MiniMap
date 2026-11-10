@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extensionName__",
+  "version": "1.4.0",
+  "description": "__MSG_extensionDescription__",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://gemini.google.com/*",
+        "https://claude.ai/*"
+      ],
+      "js": [
+        "content/i18n.js",
+        "content/styles.js",
+        "content/profiles.js",
+        "content/adapter.js",
+        "content/platform.js",
+        "content/serialize.js",
+        "content/store.js",
+        "content/history.js",
+        "content/preferences.js",
+        "content/export.js",
+        "content/layout.js",
+        "content/minimap.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png",
+    "512": "icons/icon-512.png"
+  },
+  "default_locale": "en",
+  "permissions": [
+    "storage"
+  ]
+}

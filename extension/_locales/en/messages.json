@@ -1,0 +1,8 @@
+{
+  "extensionName": {
+    "message": "Conversation Minimap"
+  },
+  "extensionDescription": {
+    "message": "A floating prompt navigator for ChatGPT, Gemini and Claude. Select and export conversations as TXT, Markdown or JSON."
+  }
+}

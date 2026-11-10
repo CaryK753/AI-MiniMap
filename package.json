@@ -1,0 +1,22 @@
+{
+  "name": "ai-minimap",
+  "version": "1.4.0",
+  "private": true,
+  "description": "Local-first conversation minimap for ChatGPT, Gemini and Claude",
+  "author": "wwj",
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests/run.cjs",
+    "test:chromium": "node tests/run.cjs chromium",
+    "test:firefox": "node tests/run.cjs firefox",
+    "test:webkit": "node tests/run.cjs webkit",
+    "screenshots": "node tests/screenshots.cjs",
+    "package": "python3 script/package.py"
+  },
+  "devDependencies": {
+    "playwright": "1.65.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
