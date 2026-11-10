@@ -36,7 +36,18 @@ const { launch, inject } = require('./runtime.cjs');
     });
   });
   await inject(page);
-  await page.evaluate(() => ConversationMinimapHistory.scan());
+  await page.evaluate(async () => {
+    const scroll = document.querySelector('#scroll');
+    const before = scroll.style.getPropertyValue('overflow-anchor');
+    window.scannerAnchoring = [];
+    ConversationMinimapHistory.subscribe(state => {
+      if (state.busy) window.scannerAnchoring.push(scroll.style.getPropertyValue('overflow-anchor'));
+    });
+    await ConversationMinimapHistory.scan();
+    window.anchorRestored = scroll.style.getPropertyValue('overflow-anchor') === before;
+  });
+  assert(await page.evaluate(() => window.anchorRestored));
+  assert(await page.evaluate(() => !CSS.supports('overflow-anchor', 'none') || window.scannerAnchoring.every(value => value === 'none')));
   const records = await page.evaluate(() => ConversationMinimapStore.entries().map(({ key, role, text }) => ({ key, role, text })));
   if (records.length !== 60) console.error('History diagnostics', JSON.stringify(await page.evaluate(() => ({
     trace: window.scanTrace, records: ConversationMinimapStore.entries().map(entry => entry.key),

@@ -28,6 +28,10 @@
     const initial = adapter.conversation();
     const scroll = adapter.scroller(initial[0]?.element);
     const savedTop = scroll.scrollTop;
+    // The scanner restores its own anchor. Native scroll anchoring can otherwise
+    // move past unread recycled rows while spacer heights change.
+    const anchoring = [scroll.style.getPropertyValue('overflow-anchor'), scroll.style.getPropertyPriority('overflow-anchor')];
+    scroll.style.setProperty('overflow-anchor', 'none', 'important');
     const rectTop = scroll === document.scrollingElement ? 0 : scroll.getBoundingClientRect().top;
     const anchor = initial.find(entry => entry.element.getBoundingClientRect().bottom > rectTop);
     const anchorOffset = anchor?.element.getBoundingClientRect().top;
@@ -87,6 +91,10 @@
           else position(scroll, savedTop);
         }
         store.capture();
+      }
+      if (scroll.style.getPropertyValue('overflow-anchor') === 'none') {
+        if (anchoring[0]) scroll.style.setProperty('overflow-anchor', ...anchoring);
+        else scroll.style.removeProperty('overflow-anchor');
       }
       controller = null;
       const count = store.entries().length;
