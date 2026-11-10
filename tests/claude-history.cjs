@@ -29,9 +29,19 @@ const { launch, inject } = require('./runtime.cjs');
     };
     scroll.addEventListener('scroll', render); render(); scroll.scrollTop = 7200; render();
   });
+  await page.evaluate(() => {
+    window.scanTrace = [];
+    document.querySelector('#scroll').addEventListener('scroll', () => {
+      window.scanTrace.push({ top: document.querySelector('#scroll').scrollTop, first: document.querySelector('[data-testid="user-message"]').getAttribute('data-turn-key') });
+    });
+  });
   await inject(page);
   await page.evaluate(() => ConversationMinimapHistory.scan());
   const records = await page.evaluate(() => ConversationMinimapStore.entries().map(({ key, role, text }) => ({ key, role, text })));
+  if (records.length !== 60) console.error('History diagnostics', JSON.stringify(await page.evaluate(() => ({
+    trace: window.scanTrace, records: ConversationMinimapStore.entries().map(entry => entry.key),
+    anchoring: CSS.supports('overflow-anchor', 'none'), reason: ConversationMinimapHistory.state.reason
+  }))));
   assert.equal(records.length, 60);
   assert.equal(records.filter(entry => entry.role === 'user').length, 30);
   assert.equal(records[0].key, 'user:user-0');
