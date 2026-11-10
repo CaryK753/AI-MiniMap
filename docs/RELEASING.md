@@ -2,7 +2,7 @@
 
 Author / 作者：wwj
 
-Pushes and pull requests to `main` run version/syntax/package checks, browser regressions in Chromium, Firefox and WebKit, and a Safari native build. Only a successful version-tag workflow creates a GitHub Release.
+Pushes and pull requests to `main` run version/syntax/package checks, browser regressions in Chromium, Firefox and WebKit, and a Safari native build. Chromium and Firefox run on Ubuntu; WebKit runs on macOS. Only a successful version-tag workflow creates a GitHub Release.
 
 提交和 PR 会检查版本、语法、打包、三个浏览器引擎及 Safari 原生构建。推送版本标签后，全部检查成功才会创建 GitHub Release。
 
