@@ -1,138 +1,100 @@
 # AI MiniMap
 
-[English](README.md) · [简体中文](README.zh-CN.md)
+[简体中文](README.md) · [English](README.en.md)
 
-为 **ChatGPT、Gemini 和 Claude** 提供轻量的对话缩略导航。悬浮展开胶囊面板，点击提示词跳转，读取更早记录，并选择需要的内容导出。
-
-**版本 1.4.1** · 作者：**wwj** · [MIT 许可证](LICENSE)
+为 ChatGPT、Gemini 和 Claude 提供轻量的对话导航与导出工具。通过悬浮展开的导航条快速定位提示词，读取更早的消息，并将所选内容保存为文件。
 
 ## 功能
 
-- **悬浮导航**：平时收起成细条，悬浮展开，点击提示词快速跳转并高亮。
-- **定时任务 / 纯 AI 会话**：没有用户提示词时，自动按 AI 回复或任务更新导航。
-- **ChatGPT Work / Codex**：识别消息角色标记，兼容旧版 Codex 气泡结构，排除独立工具输出。
-- **历史采集**：使用网站自己的滚动加载机制，将读到的消息保留在当前页面内存；支持节点被移除或复用的列表，可查看进度、随时停止。
-- **选择导出**：筛选用户提示词 / AI 回复、逐条勾选，下载 **TXT、Markdown、JSON**。
-- **设置**：中英双语自动选择，可手动切换；跟随系统 / 亮色 / 暗色；**左侧 / 右侧**位置，自动保存偏好。
-- **侧边栏避让**：放在左侧时跟随网站侧边栏展开和收起调整位置；窄屏遮罩侧边栏占满空间时暂时隐藏。
-- **空白页不打扰**：新对话没有消息时隐藏，出现首条消息后自动恢复。
-- **动效与辅助功能**：键盘导航、焦点提示、减少动态效果，以及提高对比度 / 减少透明度时的不透明回退。
+- **快速导航**：点击提示词跳转并高亮；没有用户提示词时，按 AI 回复或任务更新导航。导航条随消息数量增长，并设有高度上限，空白对话自动隐藏。
+- **历史读取**：通过网页自身的滚动加载机制收集消息，显示实时进度，支持停止；完成后恢复阅读位置。
+- **按需导出**：筛选用户提示词和 AI 回复，逐条选择，导出 TXT、Markdown 或 JSON。
+- **外观设置**：支持左右位置、侧边栏避让、亮色与暗色主题、中英双语及自动语言选择。玻璃效果默认关闭，可手动开启。
+- **使用辅助**：支持键盘导航、减少动态效果、设置说明，以及 GitHub 最新版本入口。
 
-## 截图演示
+## 界面预览
 
-以下截图全部使用**本地合成对话**，不包含私人账号聊天。实际使用 Firefox、Chromium 和 WebKit 渲染，周围的聊天布局是可重复生成的测试页面。
+以下截图使用合成对话，不包含私人聊天内容。
 
-### Firefox 中的提示词导航
+| 对话导航 | 设置 |
+| --- | --- |
+| ![对话导航](docs/images/compact-navigation.png) | ![设置](docs/images/settings-glass-toggle.png) |
 
-![Firefox 提示词导航](docs/images/firefox-navigation.png)
-
-### 选择并导出消息
-
-![Firefox 中选择消息并导出 JSON](docs/images/firefox-export.png)
-
-### 定时任务更新导航
-
-![Chromium 中纯 AI 任务更新导航](docs/images/chromium-scheduled.png)
-
-### 左侧位置与展开的侧边栏
-
-![左侧导航避开网页侧边栏](docs/images/chromium-left-sidebar.png)
-
-### 语言、主题和位置设置
-
-![WebKit 渲染的暗色设置面板](docs/images/webkit-settings.png)
+![选择消息并导出](docs/images/firefox-export.png)
 
 ## 安装
 
-下载仓库源码，或在仓库根目录运行：
+从 [Releases](https://github.com/CaryK753/AI-MiniMap/releases) 下载对应文件，或克隆源码后运行 `python3 script/package.py` 生成安装包。
 
-```sh
-python3 script/package.py
-```
-
-生成文件位于 `outputs/`：
-
-| 浏览器 | 文件 / 源码目录 | 安装方式 |
+| 浏览器 | 安装包 | 安装方式 |
 | --- | --- | --- |
-| Chrome / Edge | `conversation-minimap.zip` 或 `extension/` | 打开扩展管理页，开启开发者模式，选择“加载已解压的扩展程序”，定位到含 `manifest.json` 的文件夹。 |
-| Firefox **140+** | `ai-minimap-firefox.zip` / `ai-minimap-firefox-unsigned.xpi` | 打开 `about:debugging#/runtime/this-firefox`，点击“临时载入附加组件”，选择 Firefox 版 manifest 或未签名 XPI。 |
-| Safari **27** | `conversation-minimap.zip` 或 `extension/` | 设置 → 开发者 → 添加临时扩展，再启用扩展并允许访问聊天网站。 |
-| Safari 原生开发版 | `conversation-minimap-safari-project.zip` 或 `safari/` | 见 [Safari 构建和签名说明](docs/SAFARI.md)。 |
+| Chrome / Edge | `conversation-minimap.zip` | 解压，打开扩展管理页并启用开发者模式，选择“加载已解压的扩展程序”，定位到含 `manifest.json` 的目录。 |
+| Firefox 140+ | `ai-minimap-firefox-unsigned.xpi` | 打开 `about:debugging#/runtime/this-firefox`，选择“临时载入附加组件”。临时安装会在浏览器重启后移除，持久安装需要 Mozilla 签名。 |
+| Safari 27 | `conversation-minimap.zip` | 解压，在 Safari 设置的开发者选项中添加临时扩展并授予网站访问权限。临时扩展会在退出 Safari 或 24 小时后失效。 |
+| Safari 原生应用 | `conversation-minimap-safari-app.zip` | 本地开发用 ad-hoc 签名版本，未公证；安装和构建方式见 [Safari 文档](docs/SAFARI.md)。 |
 
-Firefox 临时附加组件在重启浏览器后移除；正式持久安装需要 Mozilla 签名，目前**没有 AMO 签名发行版**。Safari 临时扩展会在 24 小时后或退出 Safari 时移除，未签名扩展系统确认需要由你自行完成。
-
-更新后需**重新加载扩展并刷新聊天网页**。根据需要允许访问 `chatgpt.com`、旧域名 `chat.openai.com`、`gemini.google.com` 和 `claude.ai`。
+更新后重新加载扩展，并刷新已打开的聊天网页。
 
 ## 使用
 
-1. 打开至少有一条消息的对话。
-2. 悬浮右侧导航条展开，或点击保持展开。
-3. 点击提示词跳转；纯 AI 会话则点击回复 / 任务更新。
-4. 点击 **⚙ 设置**，选择语言、主题及左右位置。
-5. 长对话先点击“加载更早记录”，等待采集数量稳定。
-6. 点击“导出对话”，筛选角色、勾选消息、选择格式并下载。
+1. 打开一段已有消息的对话，悬浮导航条展开面板；点击导航条可保持展开。
+2. 点击列表项跳转到对应消息。
+3. 长对话可点击标题右侧的历史图标，读取更早消息；再次点击停止。悬浮图标可查看功能说明。
+4. 点击“导出对话”，筛选角色、选择消息和文件格式，下载文件。
+5. 在“设置”中调整外观、位置和语言，或通过“检查更新”打开 GitHub 最新发布页。
 
-**键盘操作**：Tab 进入控件，上下方向键选择导航项，Enter 跳转；Esc 关闭面板或停止历史采集。采集时主动滚动网页也会停止本轮读取。
+键盘操作：Tab 移动焦点，上下方向键选择导航项，Enter 跳转，Esc 关闭面板或停止历史读取。读取期间主动滚动网页也会停止本轮收集。
 
-## 支持范围与边界
+## 支持范围
 
-| 网站 / 页面 | 适配与验证情况 |
+| 平台 | 支持内容 |
 | --- | --- |
-| ChatGPT 普通 / 项目会话 | 兼容新版 search-unit 标记和旧版消息角色属性。 |
-| ChatGPT 定时任务会话 | 纯 AI 回复导航；已检查真实登录账号中的定时会话结构。 |
-| ChatGPT Work / Codex | 支持角色标记及受路径限制的旧 Codex 气泡兜底；测试布局通过，独立旧版 Codex 任务页没有完成真实账号验证。 |
-| Gemini | 提取 user-query / model-response，移除无障碍“你说”等标签，支持分页读取。 |
-| Claude 聊天 / 分享页 | 已核对登录后的新版 user-message、assistant-message、data-turn-key 和正文标记；保留旧结构兼容，忽略登录页示例。 |
+| ChatGPT | 普通与项目会话、定时任务中的纯 AI 回复、Work / Codex 角色标记及旧版气泡结构。独立旧版 Codex 任务页尚未完成真实账号验证。 |
+| Gemini | 用户提示词、AI 回复与虚拟列表历史读取。 |
+| Claude | 聊天与分享页面，支持消息节点复用；忽略登录页示例内容。 |
 
-只能采集网站提供给当前网页的内容。网站可能分批加载、复用消息节点，或者停止提供更早的内容。**“已遍历页面两端”不等于服务端历史完整性保证。** 每轮最多读取约三分钟，可再次继续。
+历史读取只能收集网页提供的消息。到达页面两端不代表服务端历史完整；每轮最多读取约三分钟，可再次继续。网站更新页面结构后，适配可能需要调整。
 
-消息缓存只保留在当前页面内存；刷新或切换会话后清空。图片仅导出引用或占位文字，不打包附件文件。Markdown 由网页结构转换，不是服务端原始 Markdown。隐藏分支及独立工具 / 终端面板不在导出范围。
+导出不包含附件文件、隐藏分支或独立工具输出。图片以引用或占位文字表示，Markdown 由网页结构转换。网页玻璃效果通过 CSS 实现；原生 Liquid Glass 仅用于支持该效果的 macOS 承载应用。
 
-玻璃效果默认关闭，可在设置中开启。Chromium 和 Firefox 使用 CSS 半透明玻璃；Safari 网页面板使用 **WebKit CSS 玻璃效果**。**原生 Liquid Glass 只用于 macOS 26+ 的承载应用窗口**，较旧系统使用系统半透明材质，网页面板不会变成原生 SwiftUI 材质。
+## 隐私与权限
 
-## 隐私
+- 不上传聊天内容，不调用 AI API 或私有对话接口，不包含统计追踪。
+- `storage` 权限仅保存外观、位置和语言偏好。
+- 消息缓存保存在当前页面内存，刷新或切换会话后清空。
+- 导出文件包含所选消息和来源网址，请按需保管。
+- 历史读取会触发聊天网站正常的加载请求；GitHub 和更新入口仅在点击时打开外部页面。
 
-- 无统计、第三方上传、AI API 调用或私有对话接口。
-- 唯一扩展 API 权限是 **`storage`**，只保存语言、主题与左右位置。
-- 对话只在内存中处理，明确点击下载才会生成文件；导出文件含来源地址及所选原文。
-- 历史读取会触发网站正常的加载请求。
-- Firefox manifest 声明 `data_collection_permissions.required: ["none"]`，扩展不向浏览器外部传输数据。
+## 本地开发
 
-## 开发与测试
-
-扩展本身**没有运行时依赖，不需要编译**。浏览器测试使用 Node.js 和 Playwright：
+扩展使用原生 JavaScript 和 Manifest V3，无运行时依赖。测试需要 Node.js 20+、Python 3 和 Playwright；Safari 原生构建还需要 macOS 与兼容的 Xcode。
 
 ```sh
-npm install
+npm ci
 npx playwright install chromium firefox webkit
+npm run check
+npm run test:release
 npm run test:chromium
 npm run test:firefox
 npm run test:webkit
-npm run screenshots
 npm run package
 ```
 
-详见 [验证范围与证据](docs/TESTING.md)，其中区分真实 DOM 检查、浏览器引擎测试和商店签名安装。
-
 ```text
-extension/       通用 Manifest V3 源码
-browsers/        浏览器专属 manifest 配置
-safari/          macOS Safari Web Extension 工程
-script/          打包与原生构建脚本
-tests/           跨浏览器测试与合成对话
-docs/            截图、Safari 安装说明及验证记录
+extension/  通用扩展源码
+browsers/   浏览器专属配置
+safari/     Safari 原生承载应用与扩展工程
+script/     版本、校验、打包和构建脚本
+tests/      浏览器回归与测试页面
+docs/       截图、安装、验证与发布文档
 ```
 
-网站结构集中在 `extension/content/profiles.js`；侧边栏避让由 `layout.js` 负责，消息标识及会话隔离由 `adapter.js`、`store.js` 负责。
+详见 [测试说明](docs/TESTING.md)、[Safari 构建](docs/SAFARI.md) 和 [发布指南](docs/RELEASING.md)。提交与 PR 自动执行校验、跨引擎回归和 Safari 构建；推送匹配产品版本的 `vX.Y.Z` 标签后自动打包并发布 Release，附带 SHA-256 校验值。
 
-macOS 构建可运行 `./script/build_and_run.sh --build-only`，或打开 Xcode 工程。脚本默认模式会构建并启动应用。本地原生构建采用 ad-hoc 签名，**没有 Apple 发行签名或公证**。
+## 问题反馈
 
-## 自动发布
+请通过 [Issues](https://github.com/CaryK753/AI-MiniMap/issues) 提交问题，附上浏览器与扩展版本、使用的平台和复现步骤。截图及日志请先移除私人信息。
 
-参见[发布指南](docs/RELEASING.md)。推送版本标签后自动测试、打包并发布 GitHub Release，附带文件校验值。
+## 许可证
 
-紧凑导航与设置（玻璃效果关闭）：
-
-![Compact navigation](docs/images/compact-navigation.png)
-
-![Glass toggle](docs/images/settings-glass-toggle.png)
+本项目采用 [MIT License](LICENSE)。

@@ -22,8 +22,9 @@ const { sites, fixture } = require('./fixtures.cjs');
     assert.equal(await page.locator('.rail').evaluate(el => el.getBoundingClientRect().height), height);
     assert.equal(await page.locator('.navigation-view>header .history-trigger').count(), 1);
     assert.equal(await page.locator('.history-status').innerText(), '');
-    const geometry = await page.locator('.history-bar').first().evaluate(el => ({ top: el.getBoundingClientRect().top, countBottom: el.parentElement.querySelector('.count').getBoundingClientRect().bottom }));
-    assert(geometry.top >= geometry.countBottom, 'History belongs below the title and count');
+    assert.equal(await page.locator('.navigation-title .count').count(), 1);
+    assert(await page.locator('.history-trigger').getAttribute('aria-label'));
+    assert.equal(await page.locator('.history-trigger svg').count(), 1);
   }
   await page.setViewportSize({ width: 1100, height: 300 });
   assert.equal(await page.locator('.rail').evaluate(el => el.getBoundingClientRect().height), 180);

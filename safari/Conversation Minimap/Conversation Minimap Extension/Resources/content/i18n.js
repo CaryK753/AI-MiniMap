@@ -6,6 +6,8 @@
       promptsLabel: 'User prompts', promptCount: '{count} prompts', local: 'Local', localProcessing: 'Processed on device',
       export: 'Export conversation', expand: 'Open conversation navigation', back: 'Back to navigation',
       glassEffect: 'Glass effect', historyChecked: 'Page history checked', recheckHistory: 'Check again',
+      loadEarlierHelp: 'Scrolls through the conversation to collect earlier messages, then restores your position. Only history provided by the page can be collected.',
+      stopHistoryHelp: 'Click to stop reading. Messages already collected are kept.',
       ready: 'Read earlier messages', loadEarlier: 'Load earlier', stop: 'Stop',
       emptyPrompts: 'No user prompts yet. You can export AI replies or load earlier messages.',
       include: 'Include', userPrompts: 'User prompts', aiReplies: 'AI replies', format: 'File format',
@@ -25,6 +27,10 @@
       error: 'Reading interrupted; retry', target: 'Historical prompt located',
       appearance: 'Settings', language: 'Language', automatic: 'Automatic', theme: 'Theme',
       system: 'System', light: 'Light', dark: 'Dark', preferences: 'Preferences',
+      positionNote: 'Choose a side; the minimap avoids the page sidebar.',
+      themeNote: 'Follow your device or choose a light or dark appearance.',
+      languageNote: 'Automatic follows your browser language. Preferences are saved on this device.',
+      checkUpdates: 'Check for updates ↗', updateNote: 'Opens the latest GitHub release to view updates and downloads.',
       preferenceNote: 'Only language and appearance are saved. Your conversations stay in this tab.',
       saveFailed: 'Could not save preferences. Changes apply only in this tab.', saved: 'Preferences saved',
       glassNote: 'Off by default. Enable translucent glass; system accessibility settings take priority.'
@@ -35,6 +41,8 @@
       promptsLabel: '用户提示词列表', promptCount: '{count} 条提示词', local: '本地', localProcessing: '当前对话 · 本地处理',
       export: '导出对话', expand: '展开对话导航', back: '返回对话导航',
       glassEffect: '玻璃效果', historyChecked: '已遍历页面历史', recheckHistory: '重新检查',
+      loadEarlierHelp: '自动滚动对话以收集更早的消息，完成后恢复原位置。仅能收集网页提供的历史记录。',
+      stopHistoryHelp: '点击停止读取，已收集的消息会保留。',
       ready: '可加载更早记录', loadEarlier: '加载更早记录', stop: '停止',
       emptyPrompts: '暂无用户提示词。可导出 AI 回复，或加载更早记录。',
       include: '包含内容', userPrompts: '用户提示词', aiReplies: 'AI 回复', format: '文件格式',
@@ -54,6 +62,10 @@
       error: '读取中断，可重试', target: '已定位历史提示词',
       appearance: '设置', language: '语言', automatic: '自动', theme: '主题',
       system: '跟随系统', light: '亮色', dark: '暗色', preferences: '偏好设置',
+      positionNote: '选择显示位置，左侧会自动避让网页侧边栏。',
+      themeNote: '默认跟随设备，也可固定为亮色或暗色。',
+      languageNote: '自动使用浏览器语言，偏好仅保存在本机。',
+      checkUpdates: '检查更新 ↗', updateNote: '前往 GitHub 最新发布页查看更新和下载安装包。',
       preferenceNote: '仅保存语言和外观偏好，对话内容只保留在当前页面。',
       saveFailed: '偏好未能保存，本次更改仅在当前页面生效。', saved: '偏好已保存',
       glassNote: '默认关闭。开启后显示半透明玻璃；优先遵循系统辅助功能设置。'
@@ -61,8 +73,14 @@
   };
   let preference = 'auto';
   function deviceLocale() {
-    const api = globalThis.browser || globalThis.chrome;
-    const language = api?.i18n?.getUILanguage?.() || navigator.languages?.[0] || navigator.language || 'en';
+    let language;
+    try {
+      const api = globalThis.browser || globalThis.chrome;
+      language = api?.i18n?.getUILanguage?.();
+    } catch {
+      // Existing tabs can outlive the extension context after an update/reload.
+    }
+    language ||= navigator.languages?.[0] || navigator.language || 'en';
     return language.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en';
   }
   const locale = () => preference === 'auto' ? deviceLocale() : preference;

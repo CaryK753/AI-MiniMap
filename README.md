@@ -1,138 +1,100 @@
 # AI MiniMap
 
-[English](README.md) · [简体中文](README.zh-CN.md)
+[简体中文](README.md) · [English](README.en.md)
 
-A lightweight, local-first conversation navigator for **ChatGPT, Gemini and Claude**. Hover to open the capsule, jump between prompts, collect earlier messages, and export the parts you need.
+为 ChatGPT、Gemini 和 Claude 提供轻量的对话导航与导出工具。通过悬浮展开的导航条快速定位提示词，读取更早的消息，并将所选内容保存为文件。
 
-**Version 1.4.1** · Author: **wwj** · [MIT License](LICENSE)
+## 功能
 
-## What it does
+- **快速导航**：点击提示词跳转并高亮；没有用户提示词时，按 AI 回复或任务更新导航。导航条随消息数量增长，并设有高度上限，空白对话自动隐藏。
+- **历史读取**：通过网页自身的滚动加载机制收集消息，显示实时进度，支持停止；完成后恢复阅读位置。
+- **按需导出**：筛选用户提示词和 AI 回复，逐条选择，导出 TXT、Markdown 或 JSON。
+- **外观设置**：支持左右位置、侧边栏避让、亮色与暗色主题、中英双语及自动语言选择。玻璃效果默认关闭，可手动开启。
+- **使用辅助**：支持键盘导航、减少动态效果、设置说明，以及 GitHub 最新版本入口。
 
-- **Hover navigation:** a compact rail expands into a prompt list; click a prompt to jump and highlight it.
-- **Scheduled / AI-only conversations:** when there are no user prompts, the list navigates AI replies and task updates instead.
-- **ChatGPT Work / Codex:** recognizes conversation role markers and the older Codex bubble layout. Tool-output panels are excluded from message extraction.
-- **Earlier history:** scrolls through the website's own loading mechanism, accumulates messages in memory, and handles unmounted or recycled message nodes. A progress indicator and Stop button remain available.
-- **Selective export:** filter user prompts / AI replies, select individual messages, then download **TXT, Markdown or JSON**.
-- **Settings:** English / Simplified Chinese, automatic language detection, System / Light / Dark themes, and **left / right positioning**. Preferences persist locally.
-- **Sidebar-aware placement:** on the left, follows the website sidebar as it expands or collapses. Temporarily hides when a narrow-screen sidebar leaves insufficient space.
-- **Quiet when empty:** no minibar on a blank new conversation. The first message brings it back automatically.
-- **Accessible motion:** keyboard navigation, visible focus, reduced-motion support, and opaque fallback for increased contrast / reduced transparency.
+## 界面预览
 
-## Screenshots
+以下截图使用合成对话，不包含私人聊天内容。
 
-All screenshots below use **synthetic local conversations**, not private account content. Browser engines are real; the surrounding chat layouts are deterministic fixtures.
-
-### Prompt navigation in Firefox
-
-![Prompt navigation, rendered in Firefox](docs/images/firefox-navigation.png)
-
-### Select and export messages
-
-![Selective JSON export in Firefox](docs/images/firefox-export.png)
-
-### Scheduled task updates
-
-![AI-only task update navigation in Chromium](docs/images/chromium-scheduled.png)
-
-### Left placement beside an expanded sidebar
-
-![Left placement with sidebar avoidance](docs/images/chromium-left-sidebar.png)
-
-### Language, theme and position settings
-
-![Dark settings panel rendered in WebKit](docs/images/webkit-settings.png)
-
-## Install
-
-Download the source from this repository, or build browser packages with:
-
-```sh
-python3 script/package.py
-```
-
-This creates the following folders and archives in `outputs/`:
-
-| Browser | Package / source | How to load |
-| --- | --- | --- |
-| Chrome / Edge | `conversation-minimap.zip` or `extension/` | Open the extension manager, enable Developer mode, choose **Load unpacked**, then select the folder containing `manifest.json`. |
-| Firefox **140+** | `ai-minimap-firefox.zip` / `ai-minimap-firefox-unsigned.xpi` | Open `about:debugging#/runtime/this-firefox`, choose **Load Temporary Add-on**, select the Firefox manifest or unsigned XPI. |
-| Safari **27** | `conversation-minimap.zip` or `extension/` | Safari Settings → Developer → **Add Temporary Extension**, then enable the extension and grant website access. |
-| Safari native development | `conversation-minimap-safari-project.zip` or `safari/` | See [Safari build and signing instructions](docs/SAFARI.md). |
-
-Firefox temporary add-ons are removed when Firefox restarts. Persistent Firefox distribution requires Mozilla signing; this project does **not** include an AMO-signed release. Safari temporary extensions expire after 24 hours or when Safari quits. Safari's unsigned-extension system confirmation must be completed by you.
-
-After updating, **reload the extension and refresh the chat webpage**. Grant access to `chatgpt.com`, the legacy `chat.openai.com`, `gemini.google.com`, and `claude.ai` as needed.
-
-## Use
-
-1. Open a conversation with at least one message.
-2. Hover over the right rail, or click it to keep the panel open.
-3. Click any prompt to jump. In AI-only chats, click a reply / task update.
-4. Choose **Settings** for language, theme and left / right position.
-5. For a long conversation, choose **Load earlier** and wait for the collected count to settle.
-6. Choose **Export conversation**, filter roles, select messages and a file format, then download.
-
-**Keyboard:** Tab enters controls; Up / Down moves between navigation items; Enter activates; Esc closes the panel or stops history collection. Scrolling the webpage while collection is running stops the sweep.
-
-## Coverage and limits
-
-| Website / layout | Implementation and verification |
+| 对话导航 | 设置 |
 | --- | --- |
-| ChatGPT chat / project chats | Supports current search-unit markers and older author-role attributes. |
-| ChatGPT scheduled conversations | AI-only reply navigation; inspected against a real signed-in scheduled conversation. |
-| ChatGPT Work / Codex | Role-marked conversations plus guarded legacy Codex bubble fallback. Layout fixtures tested; separate legacy Codex task pages were not live-account verified. |
-| Gemini | User-query / model-response parsing, hidden sender-label removal, paginated history collection. |
-| Claude chat / share | Current `user-message`, `assistant-message`, `data-turn-key`, and reply-text hooks inspected in a signed-in account. Legacy response-class fallback retained. Login-page demonstration messages are ignored. |
+| ![对话导航](docs/images/compact-navigation.png) | ![设置](docs/images/settings-glass-toggle.png) |
 
-Only messages supplied by the webpage can be collected. A website may load history gradually, recycle nodes or stop providing older messages. **“Reached both page ends” is not a guarantee of complete server history.** Collection stops after about three minutes per pass; you can run it again.
+![选择消息并导出](docs/images/firefox-export.png)
 
-Conversation caches are in this tab's memory only and clear on refresh / conversation change. Images are exported as references or placeholders; attachment files are not bundled. Markdown is reconstructed from visible webpage structure rather than retrieved as original server Markdown. Hidden branches and separate tool / terminal panels are not exported.
+## 安装
 
-Glass is disabled by default; enable it in Settings. Chromium and Firefox use CSS translucent glass. Safari webpage panels use **WebKit CSS glass**, not native Liquid Glass. The macOS containing app uses **native SwiftUI Liquid Glass on macOS 26+**, with a system-material fallback on older macOS versions.
+从 [Releases](https://github.com/CaryK753/AI-MiniMap/releases) 下载对应文件，或克隆源码后运行 `python3 script/package.py` 生成安装包。
 
-## Privacy
+| 浏览器 | 安装包 | 安装方式 |
+| --- | --- | --- |
+| Chrome / Edge | `conversation-minimap.zip` | 解压，打开扩展管理页并启用开发者模式，选择“加载已解压的扩展程序”，定位到含 `manifest.json` 的目录。 |
+| Firefox 140+ | `ai-minimap-firefox-unsigned.xpi` | 打开 `about:debugging#/runtime/this-firefox`，选择“临时载入附加组件”。临时安装会在浏览器重启后移除，持久安装需要 Mozilla 签名。 |
+| Safari 27 | `conversation-minimap.zip` | 解压，在 Safari 设置的开发者选项中添加临时扩展并授予网站访问权限。临时扩展会在退出 Safari 或 24 小时后失效。 |
+| Safari 原生应用 | `conversation-minimap-safari-app.zip` | 本地开发用 ad-hoc 签名版本，未公证；安装和构建方式见 [Safari 文档](docs/SAFARI.md)。 |
 
-- No analytics, third-party uploads, AI API calls or private conversation APIs.
-- The only extension API permission is **`storage`**, used for language, theme and side preference.
-- Conversation text remains in memory until you explicitly download an export. Export files include source URL and original selected content.
-- Reading earlier history triggers the website's normal loading requests.
-- Firefox's manifest declares `data_collection_permissions.required: ["none"]`; no data is transmitted outside the browser by the extension.
+更新后重新加载扩展，并刷新已打开的聊天网页。
 
-## Develop and test
+## 使用
 
-The extension has **no runtime dependencies or build step**. Browser tests use Node.js and Playwright:
+1. 打开一段已有消息的对话，悬浮导航条展开面板；点击导航条可保持展开。
+2. 点击列表项跳转到对应消息。
+3. 长对话可点击标题右侧的历史图标，读取更早消息；再次点击停止。悬浮图标可查看功能说明。
+4. 点击“导出对话”，筛选角色、选择消息和文件格式，下载文件。
+5. 在“设置”中调整外观、位置和语言，或通过“检查更新”打开 GitHub 最新发布页。
+
+键盘操作：Tab 移动焦点，上下方向键选择导航项，Enter 跳转，Esc 关闭面板或停止历史读取。读取期间主动滚动网页也会停止本轮收集。
+
+## 支持范围
+
+| 平台 | 支持内容 |
+| --- | --- |
+| ChatGPT | 普通与项目会话、定时任务中的纯 AI 回复、Work / Codex 角色标记及旧版气泡结构。独立旧版 Codex 任务页尚未完成真实账号验证。 |
+| Gemini | 用户提示词、AI 回复与虚拟列表历史读取。 |
+| Claude | 聊天与分享页面，支持消息节点复用；忽略登录页示例内容。 |
+
+历史读取只能收集网页提供的消息。到达页面两端不代表服务端历史完整；每轮最多读取约三分钟，可再次继续。网站更新页面结构后，适配可能需要调整。
+
+导出不包含附件文件、隐藏分支或独立工具输出。图片以引用或占位文字表示，Markdown 由网页结构转换。网页玻璃效果通过 CSS 实现；原生 Liquid Glass 仅用于支持该效果的 macOS 承载应用。
+
+## 隐私与权限
+
+- 不上传聊天内容，不调用 AI API 或私有对话接口，不包含统计追踪。
+- `storage` 权限仅保存外观、位置和语言偏好。
+- 消息缓存保存在当前页面内存，刷新或切换会话后清空。
+- 导出文件包含所选消息和来源网址，请按需保管。
+- 历史读取会触发聊天网站正常的加载请求；GitHub 和更新入口仅在点击时打开外部页面。
+
+## 本地开发
+
+扩展使用原生 JavaScript 和 Manifest V3，无运行时依赖。测试需要 Node.js 20+、Python 3 和 Playwright；Safari 原生构建还需要 macOS 与兼容的 Xcode。
 
 ```sh
-npm install
+npm ci
 npx playwright install chromium firefox webkit
+npm run check
+npm run test:release
 npm run test:chromium
 npm run test:firefox
 npm run test:webkit
-npm run screenshots
 npm run package
 ```
 
-See [test coverage and evidence](docs/TESTING.md) for the difference between live DOM inspection, browser-engine fixture tests and signed-store installation.
-
 ```text
-extension/       Shared Manifest V3 source
-browsers/        Browser-specific manifest overrides
-safari/          macOS Safari Web Extension Xcode project
-script/          Packaging and native build helpers
-tests/           Cross-browser fixtures and regression tests
-docs/            Screenshots, Safari instructions and test notes
+extension/  通用扩展源码
+browsers/   浏览器专属配置
+safari/     Safari 原生承载应用与扩展工程
+script/     版本、校验、打包和构建脚本
+tests/      浏览器回归与测试页面
+docs/       截图、安装、验证与发布文档
 ```
 
-`extension/content/profiles.js` centralizes site-specific hooks. `layout.js` owns sidebar-aware placement; `adapter.js` and `store.js` handle message identity and conversation boundaries.
+详见 [测试说明](docs/TESTING.md)、[Safari 构建](docs/SAFARI.md) 和 [发布指南](docs/RELEASING.md)。提交与 PR 自动执行校验、跨引擎回归和 Safari 构建；推送匹配产品版本的 `vX.Y.Z` 标签后自动打包并发布 Release，附带 SHA-256 校验值。
 
-For macOS native development, run `./script/build_and_run.sh --build-only` or use the Xcode scheme. The default script also launches the app. Local application builds use ad-hoc signing; they are **not notarized distribution builds**.
+## 问题反馈
 
-## Automated releases
+请通过 [Issues](https://github.com/CaryK753/AI-MiniMap/issues) 提交问题，附上浏览器与扩展版本、使用的平台和复现步骤。截图及日志请先移除私人信息。
 
-See [release instructions](docs/RELEASING.md). Version tags automatically test, package and publish GitHub Releases with checksums.
+## 许可证
 
-Current compact navigation and Settings (glass disabled):
-
-![Compact navigation](docs/images/compact-navigation.png)
-
-![Glass toggle](docs/images/settings-glass-toggle.png)
+本项目采用 [MIT License](LICENSE)。

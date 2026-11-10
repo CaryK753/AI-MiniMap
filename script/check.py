@@ -29,7 +29,7 @@ def check(tag=None):
         lines = [line for line in path.read_text().splitlines() if line.strip() and not line.lstrip().startswith("//")]
         if len(lines) > 300:
             raise ValueError(f"{path.name} exceeds 300 code lines")
-    for name in ["README.md", "README.zh-CN.md"]:
+    for name in ["README.md", "README.zh-CN.md", "README.en.md"]:
         path = ROOT / name
         for target in re.findall(r"\]\(([^)]+)\)", path.read_text()):
             if not target.startswith(("http", "#")) and not (path.parent / target.split("#")[0]).exists():

@@ -16,7 +16,7 @@ const { fixture, sites } = require('./fixtures.cjs');
     await page.locator('.rail').hover();
     assert.equal(await page.locator('.item').count(), 6);
     if (site === 'scheduled') {
-      assert.equal(await page.locator('.count').innerText(), '6 replies');
+      assert.equal(await page.locator('.count').getAttribute('aria-label'), '6 replies');
       assert((await page.locator('.item').first().innerText()).includes('Task update 1'));
     }
     await page.emulateMedia({ reducedMotion: 'reduce' });

@@ -32,7 +32,7 @@ def set_version(version):
     PROJECT.write_text(re.sub(r'"MARKETING_VERSION": "[^"]+"', f'"MARKETING_VERSION": "{version}"', PROJECT.read_text()))
     resource = ROOT / "safari/Conversation Minimap/Conversation Minimap Extension/Resources/manifest.json"
     resource.write_text((ROOT / "extension/manifest.json").read_text())
-    for name in ["README.md", "README.zh-CN.md", "docs/SAFARI.md"]:
+    for name in ["README.md", "README.zh-CN.md", "README.en.md", "docs/SAFARI.md"]:
         path = ROOT / name
         text = re.sub(r"(?<=Version )\d+\.\d+\.\d+|(?<=版本 )\d+\.\d+\.\d+|(?<=版本：)\d+\.\d+\.\d+", version, path.read_text())
         path.write_text(text)

@@ -1,6 +1,6 @@
 {
   "name": "ai-minimap",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "private": true,
   "description": "Local-first conversation minimap for ChatGPT, Gemini and Claude",
   "author": "wwj",

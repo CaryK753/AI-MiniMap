@@ -42,7 +42,25 @@
         <option value="system" data-i18n="system"></option><option value="light" data-i18n="light"></option><option value="dark" data-i18n="dark"></option>
       </select></label><label><span data-i18n="language"></span><select name="language">
         <option value="auto" data-i18n="automatic"></option><option value="zh-CN">简体中文</option><option value="en">English</option>
-      </select></label><label><span data-i18n="glassEffect"></span><input type="checkbox" role="switch" name="glass"></label><p data-i18n="glassNote"></p><p data-i18n="preferenceNote"></p><p class="settings-status" role="status" aria-live="polite"></p></div>`;
+      </select></label><label><span data-i18n="glassEffect"></span><input type="checkbox" role="switch" name="glass"></label><p data-i18n="glassNote"></p><p class="settings-status" role="status" aria-live="polite"></p></div>`;
+    const notes = { side: 'positionNote', theme: 'themeNote', language: 'languageNote', glass: 'glassNote' };
+    view.querySelector('[data-i18n="glassNote"]').remove();
+    for (const [name, note] of Object.entries(notes)) {
+      const label = view.querySelector(`[name="${name}"]`).closest('label');
+      const group = document.createElement('div'); group.className = 'setting-group';
+      label.before(group); group.append(label);
+      const description = document.createElement('p'); description.dataset.i18n = note;
+      description.id = `minimap-${name}-note`; group.append(description);
+      label.querySelector('select,input').setAttribute('aria-describedby', description.id);
+    }
+    let version = '—';
+    try { version = api?.runtime?.getManifest?.().version || version; } catch { /* Context may have expired. */ }
+    const about = document.createElement('div'); about.className = 'settings-about';
+    about.innerHTML = `<div><span>AI MiniMap</span><span class="version"></span></div>
+      <div class="about-links"><a href="https://github.com/CaryK753/AI-MiniMap" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      <a href="https://github.com/CaryK753/AI-MiniMap/releases/latest" target="_blank" rel="noopener noreferrer" data-i18n="checkUpdates"></a></div><p data-i18n="updateNote"></p>`;
+    about.querySelector('.version').textContent = `v${version}`;
+    view.querySelector('.settings-options').append(about);
     root.querySelector('.panel').append(view);
     const status = view.querySelector('.settings-status');
     function close() { view.hidden = true; navigation.hidden = false; }
