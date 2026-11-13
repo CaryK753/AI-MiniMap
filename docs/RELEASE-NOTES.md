@@ -1,3 +1,21 @@
+## 1.5.0
+
+### 中文
+
+- 新增 DeepSeek 网页版（chat.deepseek.com）适配：提示词导航、AI 回复导出与虚拟列表历史读取。
+- 深度思考内容不计入 AI 回复；代码块导出保留语言标记，复制、下载等工具栏文字不进入文件。
+- 左侧位置按会话栏边缘计算偏移，避让 DeepSeek 以哈希类名构建的侧边栏。
+- 位置新增「自动」档：DeepSeek 默认靠左，其余平台保持靠右；旧版本保存的默认右侧会自动迁移，显式选择仍然优先。
+- 导航标签不再包含图标、内联样式和代码块工具栏文字。
+
+### English
+
+- Add DeepSeek web (`chat.deepseek.com`): prompt navigation, AI reply export and virtual-list history collection.
+- DeepThink reasoning stays out of replies; code fences keep their language while copy/download toolbar text is excluded.
+- Left placement derives its offset from the conversation column, so hashed sidebar containers are avoided too.
+- Placement gains an "Automatic" mode: DeepSeek opens on the left, other platforms stay right. Legacy saved defaults migrate automatically and explicit choices still win.
+- Message labels no longer include icons, inline styles or code-block toolbar text.
+
 ## 1.4.2
 
 ### 中文

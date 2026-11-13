@@ -2,14 +2,14 @@
 
 [简体中文](README.md) · [English](README.en.md)
 
-Lightweight conversation navigation and selective export for ChatGPT, Gemini and Claude.
+Lightweight conversation navigation and selective export for ChatGPT, Gemini, Claude and DeepSeek.
 
 ## Features
 
 - Hover to expand a compact minimap; click prompts to jump and highlight messages. AI-only conversations navigate replies instead. The rail grows with message count and hides on empty chats.
 - Collect earlier messages through the website's own loading mechanism, with inline progress, cancellation and reading-position restoration.
 - Select user prompts or AI replies and export TXT, Markdown or JSON.
-- Choose left/right placement, sidebar avoidance, system/light/dark themes, and English or Simplified Chinese. Glass is optional and disabled by default.
+- Placement can follow the platform (DeepSeek opens on the left), left or right, with sidebar avoidance; plus system/light/dark themes and English or Simplified Chinese. Glass is optional and disabled by default.
 - Keyboard navigation, reduced-motion support, contextual help and a link to the latest release.
 
 ## Preview
@@ -45,7 +45,7 @@ Tab moves focus, arrow keys move between navigation items, Enter activates, and 
 
 ## Compatibility and limitations
 
-ChatGPT supports ordinary/project chats, scheduled AI-only updates and role-marked Work/Codex conversations. Legacy Codex task layouts have fixture coverage but have not been verified in a live account. Gemini supports virtual history lists; Claude supports chat/share pages and recycled message nodes.
+ChatGPT supports ordinary/project chats, scheduled AI-only updates and role-marked Work/Codex conversations. Legacy Codex task layouts have fixture coverage but have not been verified in a live account. Gemini supports virtual history lists; Claude supports chat/share pages and recycled message nodes. DeepSeek web chats (`chat.deepseek.com/a/chat/…`) use a single virtualized list; DeepThink reasoning is kept out of replies.
 
 Collection depends on messages exposed by the page. Reaching both page ends does not guarantee complete server history. Each pass lasts up to approximately three minutes and can be repeated. Website layout changes may require adapter updates.
 

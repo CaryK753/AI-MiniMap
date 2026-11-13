@@ -2,21 +2,34 @@
   const i18n = globalThis.ConversationMinimapI18n;
   const api = globalThis.browser || globalThis.chrome;
   const key = 'conversationMinimapPreferences';
-  let values = { theme: 'system', language: 'auto', side: 'right', glass: false };
+  const schema = 2;
+  const platformSide = () => globalThis.ConversationMinimapProfiles?.deepseek ? 'left' : 'right';
+  let values = { theme: 'system', language: 'auto', side: 'auto', glass: false };
   const subscribers = new Set();
   function normalize(input = {}) {
     if (!input || typeof input !== 'object') input = {};
     return {
       glass: input.glass === true,
-      side: ['left', 'right'].includes(input.side) ? input.side : 'right',
+      side: ['auto', 'left', 'right'].includes(input.side) ? input.side : 'auto',
       theme: ['system', 'light', 'dark'].includes(input.theme) ? input.theme : 'system',
       language: ['auto', 'en', 'zh-CN'].includes(input.language) ? input.language : 'auto'
     };
   }
   function notify() { i18n.setPreference(values.language); subscribers.forEach(callback => callback(values)); }
+  const persist = () => api?.storage?.local?.set({ [key]: { ...values, schema } });
   const ready = (async () => {
     try {
-      if (api?.storage?.local) values = normalize((await api.storage.local.get(key))[key]);
+      if (api?.storage?.local) {
+        const stored = (await api.storage.local.get(key))[key];
+        values = normalize(stored);
+        // Earlier builds only stored the resolved side, where 'right' was the
+        // built-in default. Treat that as "follow the platform" so DeepSeek can
+        // open on the left without an explicit choice; an explicit left stays.
+        if (stored && stored.schema !== schema) {
+          if (values.side === 'right') values.side = 'auto';
+          await persist();
+        }
+      }
     } catch { /* Storage may be unavailable in temporary extension contexts. */ }
     notify();
   })();
@@ -25,7 +38,7 @@
     values = normalize({ ...values, ...change }); notify();
     try {
       if (!api?.storage?.local) return false;
-      await api.storage.local.set({ [key]: values }); return true;
+      await persist(); return true;
     } catch { return false; }
   }
   api?.storage?.onChanged?.addListener((changes, area) => {
@@ -38,7 +51,7 @@
     const navigation = root.querySelector('.navigation-view');
     const view = document.createElement('section'); view.className = 'settings-view'; view.hidden = true;
     view.innerHTML = `<header><button class="icon-button settings-back" data-i18n-aria="back">←</button><div class="heading" data-i18n="preferences"></div></header>
-      <div class="settings-options"><label><span data-i18n="position"></span><select name="side"><option value="right" data-i18n="right"></option><option value="left" data-i18n="left"></option></select></label><label><span data-i18n="theme"></span><select name="theme">
+      <div class="settings-options"><label><span data-i18n="position"></span><select name="side"><option value="auto" data-i18n="automatic"></option><option value="left" data-i18n="left"></option><option value="right" data-i18n="right"></option></select></label><label><span data-i18n="theme"></span><select name="theme">
         <option value="system" data-i18n="system"></option><option value="light" data-i18n="light"></option><option value="dark" data-i18n="dark"></option>
       </select></label><label><span data-i18n="language"></span><select name="language">
         <option value="auto" data-i18n="automatic"></option><option value="zh-CN">简体中文</option><option value="en">English</option>
@@ -82,7 +95,7 @@
       host.dataset.glass = String(preferences.glass);
       view.querySelector('[name="glass"]').checked = preferences.glass;
       host.dataset.theme = preferences.theme;
-      shell.dataset.side = preferences.side;
+      shell.dataset.side = preferences.side === 'auto' ? platformSide() : preferences.side;
       view.querySelector('[name="side"]').value = preferences.side;
       document.dispatchEvent(new CustomEvent('conversation-minimap-layout'));
       view.querySelector('[name="theme"]').value = preferences.theme;

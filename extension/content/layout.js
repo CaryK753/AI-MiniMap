@@ -16,6 +16,11 @@
             rect.width >= innerWidth * .95) return;
         edge = Math.max(edge, rect.right);
       });
+      // Some sites build the sidebar from hashed classes. Their conversation
+      // column starts where the sidebar ends, which is enough to stay clear of it.
+      const anchor = globalThis.ConversationMinimapProfiles?.sidebarAnchor;
+      const column = anchor ? document.querySelector(anchor)?.getBoundingClientRect() : null;
+      if (column && column.left > 8 && column.left < innerWidth * .45) edge = Math.max(edge, column.left);
       return edge;
     }
     function update() {

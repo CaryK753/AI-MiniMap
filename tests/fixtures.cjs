@@ -2,10 +2,14 @@
 const sites = {
   chatgpt: 'https://chatgpt.com/c/demo', scheduled: 'https://chatgpt.com/c/scheduled-demo',
   work: 'https://chatgpt.com/work?threadId=demo', codex: 'https://chatgpt.com/codex/tasks/demo',
-  claude: 'https://claude.ai/chat/demo', gemini: 'https://gemini.google.com/app/demo'
+  claude: 'https://claude.ai/chat/demo', gemini: 'https://gemini.google.com/app/demo',
+  deepseek: 'https://chat.deepseek.com/a/chat/s/demo'
 };
 function message(site, index, role, text) {
   const user = role === 'user';
+  if (site === 'deepseek') return `<div class="_9663006" data-virtual-list-item-key="${index}"><div class="ds-message">${user
+    ? `<div class="fbb737a4"><div class="ds-collapsible-text"><div class="md-user-markdown ds-markdown"><p class="ds-markdown-paragraph">${text}</p></div></div><div class="ds-flex"><div role="button" class="ds-button"><div class="ds-icon"></div></div></div></div>`
+    : `<div class="ds-markdown ds-assistant-message-main-content">${text}</div>`}</div></div>`;
   if (site === 'claude') return `<div data-turn-key="${index}">${user
     ? `<div data-testid="user-message" class="bubble">${text}</div>`
     : `<div data-testid="assistant-message" data-turn-key="${index}" data-is-streaming="false"><div class="prose"><div class="standard-markdown" data-perf-reply-text>${text}</div></div><button>Copy</button></div>`}</div>`;
@@ -31,6 +35,6 @@ function fixture(site, count = 6) {
     main{min-width:0}header{height:74px;padding:20px 32px;border-bottom:1px solid #e9e9ec;display:flex;justify-content:space-between;align-items:center;background:#ffffffa0}header strong{font-size:17px}header span{color:#888;font-size:11px}.thread-scroll-container{height:calc(100vh - 74px);overflow:auto;padding:28px max(30px,calc((100% - 620px)/2)) 120px;scrollbar-width:thin}
     .bubble{background:#ecebed;border-radius:20px;padding:16px 20px;margin:18px 0 24px 55px}.markdown,.font-claude-response{margin:22px 0 38px}h2{font-size:19px;letter-spacing:-.02em}p{margin:10px 0}pre{background:#f0f0f2;border-radius:14px;padding:18px;font:12px/1.6 ui-monospace,monospace;overflow:auto}.sr-only{display:none}user-query,model-response{display:block}
     @media(prefers-color-scheme:dark){body{background:#171719;color:#eee}aside{background:#202023;border-color:#333}aside button,header{background:#262629;color:#eee;border-color:#333}.bubble,pre{background:#2c2c30}}
-  </style></head><body><div class="app"><aside id="sidebar" aria-label="Sidebar"><button id="toggle" aria-label="Toggle sidebar">☰</button><p>＋ New chat</p><div hidden data-testid="user-message">Sidebar decoy</div></aside><main><header><strong>${site === 'scheduled' ? 'Scheduled updates' : site === 'work' || site === 'codex' ? 'Work · Project notes' : site === 'claude' ? 'Claude · Project notes' : 'Project notes'}</strong><span>AI MiniMap demo · synthetic content</span></header><div class="thread-scroll-container" data-thread-find-target="conversation">${messages}<div hidden data-message-author-role="assistant">Hidden branch</div><div data-testid="tool-output"><div data-message-role="assistant">Tool output must stay out</div></div></div></main></div><script>document.querySelector('#toggle').onclick=()=>document.body.dataset.expanded=String(document.body.dataset.expanded!=='true');</script></body></html>`;
+  </style></head><body><div class="app"><aside id="sidebar" aria-label="Sidebar"><button id="toggle" aria-label="Toggle sidebar">☰</button><p>＋ New chat</p><div hidden data-testid="user-message">Sidebar decoy</div></aside><main><header><strong>${site === 'scheduled' ? 'Scheduled updates' : site === 'work' || site === 'codex' ? 'Work · Project notes' : site === 'claude' ? 'Claude · Project notes' : 'Project notes'}</strong><span>AI MiniMap demo · synthetic content</span></header><div class="thread-scroll-container${site === 'deepseek' ? ' ds-virtual-list ds-scroll-area' : ''}" data-thread-find-target="conversation">${messages}<div hidden data-message-author-role="assistant">Hidden branch</div><div data-testid="tool-output"><div data-message-role="assistant">Tool output must stay out</div></div></div></main></div><script>document.querySelector('#toggle').onclick=()=>document.body.dataset.expanded=String(document.body.dataset.expanded!=='true');</script></body></html>`;
 }
 module.exports = { sites, fixture, message };

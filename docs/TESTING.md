@@ -8,12 +8,13 @@ The 1.4.0 change set is checked in Chromium, Firefox and WebKit using local dete
 
 | Area | Checks |
 | --- | --- |
-| Site profiles | ChatGPT chat, AI-only scheduled updates, role-marked Work, guarded legacy Codex bubbles, current Claude hooks, Gemini |
+| Site profiles | ChatGPT chat, AI-only scheduled updates, role-marked Work, guarded legacy Codex bubbles, current Claude hooks, Gemini, DeepSeek virtual chat |
 | Navigation | Prompt / reply count, click target, active item, AI-only fallback |
 | Empty pages | Initially hidden rail; first user or AI content restores it; login-page samples ignored |
-| Position | Left / right, collapsed and expanded sidebars, narrow overlay obstruction, restored preference |
+| Position | Left / right, collapsed and expanded sidebars, narrow overlay obstruction, restored preference, DeepSeek column-edge offset |
 | History | Delayed pagination, virtualized windows, 60 ordered messages, identical prompts retained, cancellation, conversation isolation |
 | Claude recycling | Reused connected DOM nodes with changed stable keys, correct historical jump, no cross-chat stale cache |
+| DeepSeek specifics | DeepThink reasoning excluded from replies, code-block language fence without toolbar text, recycled-row jump |
 | Export | Actual TXT / Markdown / JSON downloads, roles, selections, code fences, tables, safe text, hidden branch / tool exclusion |
 | Language and theme | en-US / zh-CN / other-language English fallback, runtime switching, original content unchanged, system theme / explicit override, saved preferences |
 | Motion | Enter / exit, no invisible hover area, progress / spinner, file preparation, reduced motion, small viewport |
@@ -23,6 +24,7 @@ The 1.4.0 change set is checked in Chromium, Firefox and WebKit using local dete
 - A signed-in ChatGPT scheduled conversation was inspected read-only. It used assistant search-unit markers without user prompts. No private chat content is included in this repository.
 - A signed-in Claude chat was inspected after login. The current page exposed `data-testid="user-message"`, `data-testid="assistant-message"`, `data-turn-key` and `[data-perf-reply-text]`. The sidebar was a semantic `aside`. The adapter retains older Claude class hooks as fallbacks.
 - Separate legacy Codex task pages were **not** live-account verified. Their path-guarded fallback has fixture coverage. Work conversations that use normal ChatGPT role/search-unit hooks share that adapter.
+- No DeepSeek account was used. The hooks were derived from a public single-file capture of a DeepSeek conversation (2026-09-15, published by an open-source message-renderer project) and loaded read-only in a local browser: `[data-virtual-list-item-key]` rows, `.ds-message`, the `.fbb737a4` user bubble, `.md-user-markdown`, `.ds-assistant-message-main-content`, `.ds-think-content` and `.md-code-block-banner-wrap`. No capture content is included in this repository; the fixture uses invented text.
 
 Live DOM inspection verifies the observed hooks, not every later website deployment. Browser-engine fixture tests verify behavior independently; they are not represented as full logged-in integration tests.
 
@@ -69,3 +71,7 @@ The five images under `docs/images/` are generated from `tests/fixtures.cjs`. Th
 ## 1.4.1 regression
 
 Author: wwj. Local Chromium, Firefox and WebKit suites passed, including glass disabled by default, toggle persistence, adaptive rail bounds, compact history placement, same-URL export cancellation and sidebar observer cleanup. Clean/repeatable packaging and tag/version checks passed. Safari ad-hoc build and signature verification passed. GitHub Actions independently runs the committed suites with locked Playwright dependencies.
+
+## 1.5.0 regression
+
+Author: wwj. Chromium and WebKit suites pass locally with the pinned Playwright build, including the new DeepSeek profile: virtual rows with recycled nodes, DeepThink exclusion, code-block language fence without toolbar text, and the column-edge sidebar offset. Firefox could not start in the local authoring sandbox and remains covered by CI. `script/check.py` and packaging checks pass; the DeepSeek hooks were also replayed against a public read-only DOM capture rather than a live account. The placement default is platform-aware (DeepSeek left, others right), legacy saved 'right' migrates to "automatic" and an explicit side still wins. The placement default is platform-aware (DeepSeek left, others right), legacy saved 'right' migrates to "automatic" and an explicit side still wins.

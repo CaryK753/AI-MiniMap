@@ -24,12 +24,16 @@
       return markdown ? inline(node.textContent) : node.textContent;
     }
     if (node.nodeType !== Node.ELEMENT_NODE) return '';
+    // DeepSeek labels code blocks in a banner above <pre>; keep the language,
+    // drop the copy/download controls that sit beside it.
+    if (node.matches('.md-code-block-banner-wrap,.md-code-block-infostring')) return '';
     const tag = node.tagName.toLowerCase();
     const children = () => [...node.childNodes].map(child => render(child, markdown)).join('');
     if (tag === 'pre') {
       const code = node.querySelector('code') || node;
       const text = code.textContent.replace(/\n$/, '');
-      const language = (code.className.match(/language-([\w+-]+)/) || [])[1] || '';
+      const label = node.closest('.md-code-block')?.querySelector('.md-code-block-banner-wrap span,.md-code-block-infostring')?.textContent.trim();
+      const language = (code.className.match(/language-([\w+-]+)/) || [])[1] || (/^[\w+#.-]{1,20}$/.test(label || '') ? label : '');
       const fence = '`'.repeat(Math.max(3, ...((text.match(/`+/g) || []).map(s => s.length + 1))));
       return markdown ? `\n\n${fence}${language}\n${text}\n${fence}\n\n` : `\n\n${text}\n\n`;
     }

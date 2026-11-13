@@ -2,7 +2,8 @@
   const hostname = location.hostname;
   const gemini = hostname === 'gemini.google.com';
   const claude = hostname === 'claude.ai';
-  const isWork = () => !gemini && !claude && /^\/(codex|work)(\/|$)/.test(location.pathname);
+  const deepseek = hostname === 'chat.deepseek.com';
+  const isWork = () => !gemini && !claude && !deepseek && /^\/(codex|work)(\/|$)/.test(location.pathname);
   const chat = {
     user: '[data-message-author-role="user"],[data-content-search-unit-key$=":user"],[data-chatgpt-search-unit-key$=":user"],[data-user-message-bubble="true"]',
     assistant: '[data-message-author-role="assistant"],[data-content-search-unit-key$=":assistant"],[data-chatgpt-search-unit-key$=":assistant"]'
@@ -22,6 +23,15 @@
       userBody: '[data-testid="user-message"],.whitespace-pre-wrap',
       assistantBody: '.font-claude-response-body,.standard-markdown,.progressive-markdown,.markdown,.prose'
     };
+    // Both DeepSeek roles share the .ds-message wrapper inside virtual list
+    // rows. Reply text uses the design system class, which also keeps DeepThink
+    // reasoning (.ds-think-content) out of the answer.
+    if (deepseek) return {
+      name: 'DeepSeek',
+      selectors: { user: '.fbb737a4', assistant: '.ds-assistant-message-main-content' },
+      userBody: '.md-user-markdown',
+      assistantBody: '.ds-assistant-message-main-content'
+    };
     return {
       name: isWork() ? 'ChatGPT Work / Codex' : 'ChatGPT',
       selectors: {
@@ -32,6 +42,9 @@
       assistantBody: '.markdown,.message-content,[data-message-content]'
     };
   }
-  globalThis.ConversationMinimapProfiles = { profile, gemini, claude,
+  // The left sidebar of chat.deepseek.com uses hashed class names, so the
+  // layout module reads its width from the conversation column instead.
+  const sidebarAnchor = deepseek ? '.ds-virtual-list' : '';
+  globalThis.ConversationMinimapProfiles = { profile, gemini, claude, deepseek, sidebarAnchor,
     isWork };
 })();

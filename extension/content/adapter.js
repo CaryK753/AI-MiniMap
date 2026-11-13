@@ -1,7 +1,7 @@
 (() => {
   const profiles = globalThis.ConversationMinimapProfiles;
   const isGemini = profiles.gemini;
-  const labels = '.sr-only,.cdk-visually-hidden,.screen-reader-user-query-label,.screen-reader-model-response-label,[aria-hidden="true"],button';
+  const labels = '.sr-only,.cdk-visually-hidden,.screen-reader-user-query-label,.screen-reader-model-response-label,[aria-hidden="true"],button,svg,style,.md-code-block-banner-wrap';
   const ids = new WeakMap();
   let serial = 0;
   function visible(el) {
@@ -14,15 +14,19 @@
   }
   function key(element, role) {
     const unit = element.closest('[data-content-search-unit-key],[data-chatgpt-search-unit-key]');
-    const turn = element.closest('.conversation-container[id],[data-turn-key],[data-message-id],[data-uuid],[data-item-key],[data-turn-id],[data-index],[data-item-index]');
+    const turn = element.closest('.conversation-container[id],[data-virtual-list-item-key],[data-turn-key],[data-message-id],[data-uuid],[data-item-key],[data-turn-id],[data-index],[data-item-index]');
     const stable = unit?.getAttribute('data-content-search-unit-key') || unit?.getAttribute('data-chatgpt-search-unit-key') ||
       element.getAttribute('data-message-id') || turn?.getAttribute('data-message-id') ||
-      turn?.getAttribute('data-turn-key') || turn?.getAttribute('data-uuid') || turn?.getAttribute('data-item-key') || turn?.getAttribute('data-turn-id') || turn?.getAttribute('data-index') || turn?.getAttribute('data-item-index') || turn?.id;
+      turn?.getAttribute('data-turn-key') || turn?.getAttribute('data-uuid') || turn?.getAttribute('data-virtual-list-item-key') ||
+      turn?.getAttribute('data-item-key') || turn?.getAttribute('data-turn-id') || turn?.getAttribute('data-index') || turn?.getAttribute('data-item-index') || turn?.id;
     if (stable) return `${role}:${stable}`;
     if (!ids.has(element)) ids.set(element, ++serial);
     return `${role}:node-${ids.get(element)}`;
   }
-  function supported() { return !profiles.claude || /^\/(chat|share|code|new)(\/|$)/.test(location.pathname); }
+  function supported() {
+    if (profiles.deepseek) return /^\/(?:a\/chat|$)/.test(location.pathname);
+    return !profiles.claude || /^\/(chat|share|code|new)(\/|$)/.test(location.pathname);
+  }
   let routeBase = '', threadId = '', threadGeneration = 0;
   function routeKey() {
     const url = new URL(location.href);
@@ -74,7 +78,7 @@
     for (let parent = element?.parentElement; parent; parent = parent.parentElement) {
       if (/(auto|scroll|overlay)/.test(getComputedStyle(parent).overflowY) && parent.scrollHeight > parent.clientHeight + 2) return parent;
     }
-    return document.querySelector('.thread-scroll-container,infinite-scroller.chat-history,[data-testid="virtuoso-scroller"],[data-radix-scroll-area-viewport]') ||
+    return document.querySelector('.thread-scroll-container,infinite-scroller.chat-history,.ds-virtual-list,[data-testid="virtuoso-scroller"],[data-radix-scroll-area-viewport]') ||
       document.scrollingElement || document.documentElement;
   }
   function loading() {

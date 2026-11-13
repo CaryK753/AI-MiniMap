@@ -13,6 +13,8 @@ const { fixture, sites } = require('./fixtures.cjs');
     const page = await context.newPage();
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     await page.goto(sites[site]); await inject(page);
+    // Position defaults follow the platform: DeepSeek opens on the left edge.
+    assert.equal(await page.locator('.shell').getAttribute('data-side'), site === 'deepseek' ? 'left' : 'right');
     await page.locator('.rail').hover();
     assert.equal(await page.locator('.item').count(), 6);
     if (site === 'scheduled') {
@@ -31,7 +33,8 @@ const { fixture, sites } = require('./fixtures.cjs');
     assert(!JSON.stringify(data).includes('Tool output must stay out'));
     assert(!JSON.stringify(data).includes('Hidden branch'));
     assert(!JSON.stringify(data).includes('Sidebar decoy'));
-    assert.equal(data.platform, site === 'claude' ? 'Claude' : site === 'gemini' ? 'Gemini' : ['work', 'codex'].includes(site) ? 'ChatGPT Work / Codex' : 'ChatGPT');
+    const names = { claude: 'Claude', gemini: 'Gemini', work: 'ChatGPT Work / Codex', codex: 'ChatGPT Work / Codex', deepseek: 'DeepSeek' };
+    assert.equal(data.platform, names[site] || 'ChatGPT');
     await page.locator('.back').click(); await page.locator('.settings-trigger').click();
     await page.locator('[name="side"]').selectOption('left'); await page.waitForTimeout(100);
     const edge = async () => (await page.locator('.rail').boundingBox()).x;
@@ -66,6 +69,11 @@ const { fixture, sites } = require('./fixtures.cjs');
       await page.waitForTimeout(650);
       assert.equal(await page.locator('.shell').isVisible(), false);
     }
+    if (site === 'deepseek') {
+      await page.evaluate(() => history.pushState({}, '', '/sign_in'));
+      await page.waitForTimeout(650);
+      assert.equal(await page.locator('.shell').isVisible(), false);
+    }
     // A fresh blank conversation hides the rail, then first content restores it.
     await page.goto(sites[site]);
     await page.evaluate(() => document.querySelector('.thread-scroll-container').replaceChildren());
@@ -74,6 +82,7 @@ const { fixture, sites } = require('./fixtures.cjs');
     await page.evaluate(() => {
       const message = document.createElement('div');
       if (location.hostname === 'claude.ai') message.dataset.testid = 'assistant-message';
+      else if (location.hostname === 'chat.deepseek.com') message.className = 'fbb737a4';
       else message.setAttribute('data-message-author-role', 'assistant');
       message.textContent = 'The first reply';
       document.querySelector('.thread-scroll-container').append(message);
